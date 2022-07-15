@@ -1,7 +1,7 @@
 const { Op } = require('sequelize');
 const db = require('../../database/models');
 const sequelize = db.sequelize;
-
+const {checkID} =require('../../helpers/index')
 
 const genresController = {
   'list': async (req, res) => {
@@ -32,15 +32,8 @@ const genresController = {
   },
   'detail': async (req, res) => {
     let response;
-    if (isNaN(req.params.id)) {
-      let response = {
-        ok: false,
-        meta: {
-          status: 404
-        },
-        msg:  "Numero incorrecto"
-      }
-      return res.status(404).json(response)
+    if(checkID(req.params.id)){
+        return res.status(404).json(checkID(req.params.id))
     }
     try {
       let genre = await db.Genre.findByPk(req.params.id);
