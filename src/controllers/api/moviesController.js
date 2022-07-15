@@ -79,11 +79,68 @@ const moviesController = {
 
     },
     
-    recomended: (req, res) => {
+    recomended: async(req, res) => {
+        let response; 
+        try {
+       
+            let movies = await db.Movie.findAll({
+                 include: ["genre"], 
+                 where: {
+                     rating: {[Op.gte]: +req.query.rating || 8}
+                 },
+                 order: [["rating", "DESC"]]
+            })
+            response ={
+                ok : true, 
+                meta: {
+                    status: 200,
+                    total: movies.length
+                },
+                data: movies
+            }
+            return res.status(200).json(response)
+
+
+        } catch (error) {
+            console.log(error);
+            let response = {
+                ok: false,
+                meta: {
+                  status: 500
+                },
+                msg: error.message ? error.message : "comuniquese con el administrador del sitio"
+              }
+              return res.status(500).json(response)
+            
+        }
        
     },
-    nuevo: (req,res)=>{
-
+    nuevo: async(req,res)=>{
+        let response; 
+        try {
+            let movies = await db.Movie.findAll({
+            order: [["release_date", "DESC"]],
+            limit: +req.query.limit || 5
+            })
+        response ={
+                ok : true, 
+                meta: {
+                    status: 200
+                },
+                data: movies
+            }
+            return res.status(200).json(response)
+        } catch (error) {
+            let response = {
+                ok: false,
+                meta: {
+                  status: 500
+                },
+                msg: error.message ? error.message : "comuniquese con el administrador del sitio"
+              }
+              return res.status(500).json(response)
+            
+          }   
     },
 
     create: (req,res) =>{
